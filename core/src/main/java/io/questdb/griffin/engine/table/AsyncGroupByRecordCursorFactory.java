@@ -279,17 +279,34 @@ public class AsyncGroupByRecordCursorFactory extends AbstractRecordCursorFactory
             RecordSink mapSink
     ) {
         final Map map = fragment.reopenMap();
-        for (long r = 0; r < frameRowCount; r++) {
-            record.setRowIndex(r);
-
+        final long startAddress = record.startAddress(0);
+        for (long p = startAddress, lim = startAddress + (frameRowCount << 3); p < lim; p += 8) {
+            // Local measurements:
+            // -- with abstractions: 270ms
+            // -- no abstractions: 208ms
+            // -- no abstractions + no PageAddressCacheRecord: 180ms
+            // SELECT hour(EventTime), count() FROM hits;
             final MapKey key = map.withKey();
-            mapSink.copy(record, key);
+            long ts = Unsafe.getUnsafe().getLong(p);
+            // TODO: hour calculation is sloooooooow
+            int hour = (int) ((ts / 3600000000L) % 24L);
+            key.putInt(hour);
             MapValue value = key.createValue();
-            if (value.isNew()) {
-                functionUpdater.updateNew(value, record, baseRowId + r);
+            if (!value.isNew()) {
+                value.addLong(0, 1);
             } else {
-                functionUpdater.updateExisting(value, record, baseRowId + r);
+                value.putLong(0, 1);
             }
+
+            // Code with all abstractions
+//            final MapKey key = map.withKey();
+//            mapSink.copy(record, key);
+//            MapValue value = key.createValue();
+//            if (value.isNew()) {
+//                functionUpdater.updateNew(value, record, baseRowId + r);
+//            } else {
+//                functionUpdater.updateExisting(value, record, baseRowId + r);
+//            }
         }
     }
 

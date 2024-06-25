@@ -346,6 +346,10 @@ public class PageAddressCacheRecord implements Record, Closeable {
         this.rowIndex = rowIndex;
     }
 
+    public long startAddress(int columnIndex) {
+        return pageAddressCache.getPageAddress(frameIndex, columnIndex);
+    }
+
     private BinarySequence getBin(long base, long offset, long pageLimit, MemoryCR.ByteSequenceView view) {
         final long address = base + offset;
         final long len = Unsafe.getUnsafe().getLong(address);
