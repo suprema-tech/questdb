@@ -9807,10 +9807,31 @@ public class SampleByTest extends AbstractCairoTest {
     }
 
     @Test
+    public void testErrorCorrectnessWhenSelectingNonDesignatedTimestamp() throws Exception {
+        assertMemoryLeak(
+                () -> {
+                    ddl("CREATE TABLE a (ts TIMESTAMP, x LONG, s VARCHAR) timestamp (ts);");
+                    ddl("CREATE TABLE b (ts TIMESTAMP, x LONG, s VARCHAR) timestamp (ts);");
+                    // we are selecting non-designated timestamp, i guess expecting that this is the
+                    // timestamp we sample by, but it isn't. The message should direct user to
+                    // select the designated timestamp.
+                    assertException(
+                            "select b.ts, avg(a.x) from a\n" +
+                                    "asof join b\n" +
+                                    "sample by 5d",
+                            0,
+                            "ok"
+                    );
+                }
+        );
+
+    }
+
+    @Test
     public void testSampleFillPrevNotKeyedAlignToCalendarTimeZone() throws Exception {
         // this test verifies transition from Summer to Winter time and
         // clock going backwards. An hour of time should drop out of the result set
-        // without the logic trying to back fill things
+        // without the logic trying to backfill things
         assertQuery(
                 "s\tto_timezone\n" +
                         "11.427984775756228\t2021-10-31T03:00:00.000000Z\n" +

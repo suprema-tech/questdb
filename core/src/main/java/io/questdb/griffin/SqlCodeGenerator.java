@@ -5343,6 +5343,22 @@ public class SqlCodeGenerator implements Mutable, Closeable {
         return getTimestampIndex(model, factory.getMetadata());
     }
 
+    /**
+     * Extracts designated timestamp column index from the factory's or table's metadata provided
+     * designated timestamp column name is not overridden by the model. Typical override is present in either
+     * of these two cases:
+     * - the underlying table/factory does not have designated timestamp, but user knows that there is sorted timestamp
+     * column and wants to pick that
+     * - the underlying factory might be a join, with multiple ordered timestamp columns, and user wants to choose
+     * column other than that provided by the factory.
+     *
+     * @param model    the model that contains the designated timestamp override
+     * @param metadata the metadata of the factory or the table.
+     * @return -1 if timestamp is both missing from the metadata and not overridden. Otherwise, index of the
+     * desginated timestamp column in the provided metadata.
+     * @throws SqlException when the designated timestamp column override is either not a valid column name or
+     *                      not of TIMESTAMP type.
+     */
     private int getTimestampIndex(QueryModel model, RecordMetadata metadata) throws SqlException {
         final ExpressionNode timestamp = model.getTimestamp();
         if (timestamp != null) {
