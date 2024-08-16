@@ -104,7 +104,7 @@ public class LineTcpBootstrapTest extends AbstractBootstrapTest {
                             // varchar
                             // BallyMac Fifra
                             // BallyMac Fifra
-                            // but one of the above has isAscii set to false
+                            // both are ascii but one of the above has isAscii set to false
                             // this messes up the hash calculation in OrderedMap when Distinct is executed
                             throw SqlException.$(0, "More than one result in record cursor. Should be one row after distinct query.");
                         }
