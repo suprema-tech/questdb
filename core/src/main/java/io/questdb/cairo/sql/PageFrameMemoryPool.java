@@ -61,17 +61,19 @@ public class PageFrameMemoryPool implements QuietCloseable {
         }
 
         final byte frameFormat = addressCache.getFrameFormat(frameIndex);
-        assert frameFormat != PageFrame.PARQUET_FORMAT;
-
-        record.init(
-                frameIndex,
-                frameFormat,
-                addressCache.getRowIdOffset(frameIndex),
-                addressCache.getPageAddresses(frameIndex),
-                addressCache.getAuxPageAddresses(frameIndex),
-                addressCache.getPageSizes(frameIndex),
-                addressCache.getAuxPageSizes(frameIndex)
-        );
+        if (frameFormat == PartitionFormat.NATIVE) {
+            record.init(
+                    frameIndex,
+                    frameFormat,
+                    addressCache.getRowIdOffset(frameIndex),
+                    addressCache.getPageAddresses(frameIndex),
+                    addressCache.getAuxPageAddresses(frameIndex),
+                    addressCache.getPageSizes(frameIndex),
+                    addressCache.getAuxPageSizes(frameIndex)
+            );
+        } else if (frameFormat == PartitionFormat.PARQUET) {
+            // TODO(puzpuzpuz): unwrap parquet memory
+        }
     }
 
     /**
@@ -88,16 +90,18 @@ public class PageFrameMemoryPool implements QuietCloseable {
             return frameMemory;
         }
 
-        frameMemory.frameIndex = frameIndex;
-        frameMemory.frameFormat = addressCache.getFrameFormat(frameIndex);
-        assert frameMemory.frameFormat != PageFrame.PARQUET_FORMAT;
+        final byte frameFormat = addressCache.getFrameFormat(frameIndex);
+        if (frameFormat == PartitionFormat.NATIVE) {
+            frameMemory.pageAddresses = addressCache.getPageAddresses(frameIndex);
+            frameMemory.auxPageAddresses = addressCache.getAuxPageAddresses(frameIndex);
+            frameMemory.pageSizes = addressCache.getPageSizes(frameIndex);
+            frameMemory.auxPageSizes = addressCache.getAuxPageSizes(frameIndex);
+        } else if (frameFormat == PartitionFormat.PARQUET) {
+            // TODO(puzpuzpuz): unwrap parquet memory
+        }
 
-        frameMemory.pageAddresses = addressCache.getPageAddresses(frameIndex);
-        frameMemory.auxPageAddresses = addressCache.getAuxPageAddresses(frameIndex);
-        frameMemory.pageSizes = addressCache.getPageSizes(frameIndex);
-        frameMemory.auxPageSizes = addressCache.getAuxPageSizes(frameIndex);
         frameMemory.frameIndex = frameIndex;
-
+        frameMemory.frameFormat = frameFormat;
         return frameMemory;
     }
 

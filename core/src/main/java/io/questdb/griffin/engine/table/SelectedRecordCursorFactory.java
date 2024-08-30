@@ -192,6 +192,11 @@ public class SelectedRecordCursorFactory extends AbstractRecordCursorFactory {
             return baseFrame.getPartitionLo();
         }
 
+        @Override
+        public int getRowGroupIndex() {
+            return baseFrame.getRowGroupIndex();
+        }
+
         public SelectedPageFrame of(PageFrame basePageFrame) {
             this.baseFrame = basePageFrame;
             return this;

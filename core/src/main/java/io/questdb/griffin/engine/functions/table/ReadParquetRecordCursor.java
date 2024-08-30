@@ -127,7 +127,7 @@ public class ReadParquetRecordCursor implements NoRandomAccessRecordCursor {
             rowGroupRowCount = -1;
             for (int columnIndex = 0, n = metadata.getColumnCount(); columnIndex < n; columnIndex++) {
                 int columnType = metadata.getColumnType(columnIndex);
-                long columnChunkBufferPtr = decoder.decodeColumnChunk(rowGroup, columnIndex, columnType);
+                long columnChunkBufferPtr = decoder.decodeRowGroup(rowGroup, columnIndex, columnType);
                 columnChunkBufferPtrs.add(columnChunkBufferPtr);
                 dataPtrs.add(PartitionDecoder.getChunkDataPtr(columnChunkBufferPtr));
                 auxPtrs.add(PartitionDecoder.getChunkAuxPtr(columnChunkBufferPtr));

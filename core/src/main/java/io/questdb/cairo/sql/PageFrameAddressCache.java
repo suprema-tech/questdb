@@ -60,7 +60,7 @@ public class PageFrameAddressCache implements Mutable {
             return; // The page frame is already cached
         }
 
-        if (frame.getFormat() == PageFrame.NATIVE_FORMAT) {
+        if (frame.getFormat() == PartitionFormat.NATIVE) {
             final LongList framePageAddresses = longListPool.next();
             final LongList framePageSizes = longListPool.next();
             final LongList frameAuxPageAddresses = longListPool.next();
@@ -151,7 +151,7 @@ public class PageFrameAddressCache implements Mutable {
 
     public boolean hasColumnTops(int frameIndex) {
         final byte frameFormat = frameFormats.getQuick(frameIndex);
-        assert frameFormat == PageFrame.NATIVE_FORMAT;
+        assert frameFormat == PartitionFormat.NATIVE;
         for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
             if (pageAddresses.getQuick(frameIndex).getQuick(columnIndex) == 0
                     // VARCHAR column that contains short strings will have zero data vector,

@@ -2423,6 +2423,7 @@ public class SqlCodeGenerator implements Mutable, Closeable {
         final PartitionFrameCursorFactory partitionFrameCursorFactory;
         if (intrinsicModel.hasIntervalFilters()) {
             partitionFrameCursorFactory = new IntervalBwdPartitionFrameCursorFactory(
+                    configuration,
                     tableToken,
                     model.getMetadataVersion(),
                     intrinsicModel.buildIntervalModel(),
@@ -2431,6 +2432,7 @@ public class SqlCodeGenerator implements Mutable, Closeable {
             );
         } else {
             partitionFrameCursorFactory = new FullBwdPartitionFrameCursorFactory(
+                    configuration,
                     tableToken,
                     model.getMetadataVersion(),
                     GenericRecordMetadata.deepCopyOf(reader.getMetadata())
@@ -5034,6 +5036,7 @@ public class SqlCodeGenerator implements Mutable, Closeable {
                 RuntimeIntrinsicIntervalModel intervalModel = intrinsicModel.buildIntervalModel();
                 if (orderDescendingByDesignatedTimestampOnly) {
                     dfcFactory = new IntervalBwdPartitionFrameCursorFactory(
+                            configuration,
                             tableToken,
                             model.getMetadataVersion(),
                             intervalModel,
@@ -5042,6 +5045,7 @@ public class SqlCodeGenerator implements Mutable, Closeable {
                     );
                 } else {
                     dfcFactory = new IntervalFwdPartitionFrameCursorFactory(
+                            configuration,
                             tableToken,
                             model.getMetadataVersion(),
                             intervalModel,
@@ -5052,9 +5056,9 @@ public class SqlCodeGenerator implements Mutable, Closeable {
                 intervalHitsOnlyOnePartition = intervalModel.allIntervalsHitOnePartition(reader.getPartitionedBy());
             } else {
                 if (orderDescendingByDesignatedTimestampOnly) {
-                    dfcFactory = new FullBwdPartitionFrameCursorFactory(tableToken, model.getMetadataVersion(), dfcFactoryMeta);
+                    dfcFactory = new FullBwdPartitionFrameCursorFactory(configuration, tableToken, model.getMetadataVersion(), dfcFactoryMeta);
                 } else {
-                    dfcFactory = new FullFwdPartitionFrameCursorFactory(tableToken, model.getMetadataVersion(), dfcFactoryMeta);
+                    dfcFactory = new FullFwdPartitionFrameCursorFactory(configuration, tableToken, model.getMetadataVersion(), dfcFactoryMeta);
                 }
                 intervalHitsOnlyOnePartition = reader.getPartitionedBy() == PartitionBy.NONE;
             }
@@ -5371,10 +5375,10 @@ public class SqlCodeGenerator implements Mutable, Closeable {
             RowCursorFactory rowCursorFactory;
 
             if (orderDescendingByDesignatedTimestampOnly) {
-                cursorFactory = new FullBwdPartitionFrameCursorFactory(tableToken, model.getMetadataVersion(), dfcFactoryMeta);
+                cursorFactory = new FullBwdPartitionFrameCursorFactory(configuration, tableToken, model.getMetadataVersion(), dfcFactoryMeta);
                 rowCursorFactory = new BwdPageFrameRowCursorFactory();
             } else {
-                cursorFactory = new FullFwdPartitionFrameCursorFactory(tableToken, model.getMetadataVersion(), dfcFactoryMeta);
+                cursorFactory = new FullFwdPartitionFrameCursorFactory(configuration, tableToken, model.getMetadataVersion(), dfcFactoryMeta);
                 rowCursorFactory = new PageFrameFwdRowCursorFactory();
             }
 
@@ -5402,7 +5406,7 @@ public class SqlCodeGenerator implements Mutable, Closeable {
                 return new LatestByAllIndexedRecordCursorFactory(
                         configuration,
                         myMeta,
-                        new FullBwdPartitionFrameCursorFactory(tableToken, model.getMetadataVersion(), dfcFactoryMeta),
+                        new FullBwdPartitionFrameCursorFactory(configuration, tableToken, model.getMetadataVersion(), dfcFactoryMeta),
                         listColumnFilterA.getColumnIndexFactored(0),
                         columnIndexes,
                         columnSizeShifts,
@@ -5416,7 +5420,7 @@ public class SqlCodeGenerator implements Mutable, Closeable {
                 return new LatestByDeferredListValuesFilteredRecordCursorFactory(
                         configuration,
                         myMeta,
-                        new FullBwdPartitionFrameCursorFactory(tableToken, model.getMetadataVersion(), dfcFactoryMeta),
+                        new FullBwdPartitionFrameCursorFactory(configuration, tableToken, model.getMetadataVersion(), dfcFactoryMeta),
                         latestByColumnIndex,
                         null,
                         columnIndexes,
@@ -5437,7 +5441,7 @@ public class SqlCodeGenerator implements Mutable, Closeable {
             return new LatestByAllSymbolsFilteredRecordCursorFactory(
                     configuration,
                     myMeta,
-                    new FullBwdPartitionFrameCursorFactory(tableToken, model.getMetadataVersion(), dfcFactoryMeta),
+                    new FullBwdPartitionFrameCursorFactory(configuration, tableToken, model.getMetadataVersion(), dfcFactoryMeta),
                     RecordSinkFactory.getInstance(asm, myMeta, listColumnFilterA),
                     keyTypes,
                     partitionByColumnIndexes,
@@ -5451,7 +5455,7 @@ public class SqlCodeGenerator implements Mutable, Closeable {
         return new LatestByAllFilteredRecordCursorFactory(
                 configuration,
                 myMeta,
-                new FullBwdPartitionFrameCursorFactory(tableToken, model.getMetadataVersion(), dfcFactoryMeta),
+                new FullBwdPartitionFrameCursorFactory(configuration, tableToken, model.getMetadataVersion(), dfcFactoryMeta),
                 RecordSinkFactory.getInstance(asm, myMeta, listColumnFilterA),
                 keyTypes,
                 null,

@@ -856,7 +856,7 @@ public class OrderByAscRowSkippingTest extends AbstractCairoTest {
         return new PageFrameRecordCursorFactory(
                 engine.getConfiguration(),
                 metadata,
-                new FullFwdPartitionFrameCursorFactory(metadata.getTableToken(), reader.getMetadataVersion(), GenericRecordMetadata.copyOf(metadata)),
+                new FullFwdPartitionFrameCursorFactory(configuration, metadata.getTableToken(), reader.getMetadataVersion(), GenericRecordMetadata.copyOf(metadata)),
                 new PageFrameFwdRowCursorFactory(),
                 false,
                 null,

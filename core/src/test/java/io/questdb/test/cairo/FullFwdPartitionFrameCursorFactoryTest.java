@@ -77,7 +77,7 @@ public class FullFwdPartitionFrameCursorFactoryTest extends AbstractCairoTest {
                 metadata = GenericRecordMetadata.copyOf(writer.getMetadata());
             }
 
-            try (FullFwdPartitionFrameCursorFactory factory = new FullFwdPartitionFrameCursorFactory(tableToken, 0, metadata)) {
+            try (FullFwdPartitionFrameCursorFactory factory = new FullFwdPartitionFrameCursorFactory(configuration, tableToken, 0, metadata)) {
                 long count = 0;
                 try (PartitionFrameCursor cursor = factory.getCursor(new SqlExecutionContextStub(engine), ORDER_ASC)) {
                     PartitionFrame frame;

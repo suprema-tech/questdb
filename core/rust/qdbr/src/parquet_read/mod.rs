@@ -14,12 +14,20 @@ pub struct ParquetDecoder {
     pub col_count: i32,
     pub row_count: usize,
     pub row_group_count: i32,
+    pub row_group_sizes_ptr: *const i32,
+    pub row_group_sizes: Vec<i32>,
     pub columns_ptr: *const ColumnMeta,
     pub columns: Vec<ColumnMeta>,
     file: File,
     metadata: FileMetaData,
     decompress_buffer: Vec<u8>,
-    column_buffers: Vec<ColumnChunkBuffers>,
+}
+
+// The fields are accessed from Java.
+#[repr(C)]
+pub struct RowGroupBuffers {
+    pub column_buffers_ptr: *const ColumnChunkBuffers,
+    pub column_buffers: Vec<ColumnChunkBuffers>,
 }
 
 #[repr(C)]
@@ -33,9 +41,9 @@ pub struct ColumnMeta {
     pub name_vec: Vec<u16>,
 }
 
+// The metadata fields are accessed from Java.
 #[repr(C)]
 pub struct ColumnChunkBuffers {
-    pub row_count: usize,
     pub data_ptr: *mut u8,
     pub data_size: usize,
     pub aux_ptr: *mut u8,

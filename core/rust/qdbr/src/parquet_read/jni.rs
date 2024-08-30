@@ -5,7 +5,7 @@ use std::ptr;
 use jni::objects::JClass;
 use jni::JNIEnv;
 
-use crate::parquet_read::{ColumnChunkBuffers, ColumnMeta, ParquetDecoder};
+use crate::parquet_read::{ColumnChunkBuffers, ColumnMeta, ParquetDecoder, RowGroupBuffers};
 use crate::parquet_write::schema::ColumnType;
 
 fn from_raw_file_descriptor(raw: i32) -> File {
@@ -52,7 +52,7 @@ pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_PartitionDec
 }
 
 #[no_mangle]
-pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_PartitionDecoder_decodeColumnChunk(
+pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_PartitionDecoder_decodeRowGroup(
     mut env: JNIEnv,
     _class: JClass,
     decoder: *mut ParquetDecoder,
@@ -93,8 +93,9 @@ pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_PartitionDec
             return throw_java_ex(&mut env, "decodeColumnChunk", &err);
         }
     }
-    let buffer = &decoder.column_buffers[column];
-    buffer as *const ColumnChunkBuffers
+    // let buffer = &decoder.column_buffers[column];
+    // buffer as *const ColumnChunkBuffers
+    std::ptr::null()
 }
 
 #[no_mangle]
@@ -119,6 +120,14 @@ pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_PartitionDec
     _class: JClass,
 ) -> usize {
     offset_of!(ParquetDecoder, row_group_count)
+}
+
+#[no_mangle]
+pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_PartitionDecoder_rowGroupSizesPtrOffset(
+    _env: JNIEnv,
+    _class: JClass,
+) -> usize {
+    offset_of!(ParquetDecoder, row_group_sizes_ptr)
 }
 
 #[no_mangle]
@@ -170,7 +179,49 @@ pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_PartitionDec
 }
 
 #[no_mangle]
-pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_PartitionDecoder_chunkDataPtrOffset(
+pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_RowGroupBuffers_create(
+    _env: JNIEnv,
+    _class: JClass,
+) -> *mut RowGroupBuffers {
+    Box::into_raw(Box::new(RowGroupBuffers {
+        column_buffers_ptr: std::ptr::null(),
+        column_buffers: Vec::new(),
+    }))
+}
+
+#[no_mangle]
+pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_RowGroupBuffers_destroy(
+    _env: JNIEnv,
+    _class: JClass,
+    buffers: *mut RowGroupBuffers,
+) {
+    if buffers.is_null() {
+        panic!("row group buffers pointer is null");
+    }
+
+    unsafe {
+        drop(Box::from_raw(buffers));
+    }
+}
+
+#[no_mangle]
+pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_RowGroupBuffers_columnChunkBuffersSize(
+    _env: JNIEnv,
+    _class: JClass,
+) -> usize {
+    size_of::<ColumnChunkBuffers>()
+}
+
+#[no_mangle]
+pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_RowGroupBuffers_columnBuffersPtrOffset(
+    _env: JNIEnv,
+    _class: JClass,
+) -> usize {
+    offset_of!(RowGroupBuffers, column_buffers_ptr)
+}
+
+#[no_mangle]
+pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_RowGroupBuffers_chunkDataPtrOffset(
     _env: JNIEnv,
     _class: JClass,
 ) -> usize {
@@ -178,7 +229,15 @@ pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_PartitionDec
 }
 
 #[no_mangle]
-pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_PartitionDecoder_chunkAuxPtrOffset(
+pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_RowGroupBuffers_chunkDataSizeOffset(
+    _env: JNIEnv,
+    _class: JClass,
+) -> usize {
+    offset_of!(ColumnChunkBuffers, data_size)
+}
+
+#[no_mangle]
+pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_RowGroupBuffers_chunkAuxPtrOffset(
     _env: JNIEnv,
     _class: JClass,
 ) -> usize {
@@ -186,11 +245,11 @@ pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_PartitionDec
 }
 
 #[no_mangle]
-pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_PartitionDecoder_chunkRowGroupCountPtrOffset(
+pub extern "system" fn Java_io_questdb_griffin_engine_table_parquet_RowGroupBuffers_chunkAuxSizeOffset(
     _env: JNIEnv,
     _class: JClass,
 ) -> usize {
-    offset_of!(ColumnChunkBuffers, row_count)
+    offset_of!(ColumnChunkBuffers, aux_size)
 }
 
 fn throw_java_ex<T>(env: &mut JNIEnv, method_name: &str, err: &impl std::fmt::Debug) -> *mut T {

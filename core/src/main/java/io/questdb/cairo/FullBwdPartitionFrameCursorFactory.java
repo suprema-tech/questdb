@@ -30,12 +30,17 @@ import io.questdb.griffin.SqlExecutionContext;
 import io.questdb.std.Misc;
 
 public class FullBwdPartitionFrameCursorFactory extends AbstractPartitionFrameCursorFactory {
-    private final FullBwdPartitionFrameCursor cursor = new FullBwdPartitionFrameCursor();
-
+    private final FullBwdPartitionFrameCursor cursor;
     private FullFwdPartitionFrameCursor fwdCursor;
 
-    public FullBwdPartitionFrameCursorFactory(TableToken tableToken, long metadataVersion, GenericRecordMetadata metadata) {
-        super(tableToken, metadataVersion, metadata);
+    public FullBwdPartitionFrameCursorFactory(
+            CairoConfiguration configuration,
+            TableToken tableToken,
+            long metadataVersion,
+            GenericRecordMetadata metadata
+    ) {
+        super(configuration, tableToken, metadataVersion, metadata);
+        this.cursor = new FullBwdPartitionFrameCursor(configuration);
     }
 
     @Override
@@ -49,7 +54,7 @@ public class FullBwdPartitionFrameCursorFactory extends AbstractPartitionFrameCu
             // Create forward scanning cursor when needed. Factory requesting forward cursor must
             // still return records in descending timestamp order.
             if (fwdCursor == null) {
-                fwdCursor = new FullFwdPartitionFrameCursor();
+                fwdCursor = new FullFwdPartitionFrameCursor(configuration);
             }
             return fwdCursor.of(reader);
         } catch (Throwable th) {

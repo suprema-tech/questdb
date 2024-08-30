@@ -24,16 +24,23 @@
 
 package io.questdb.cairo;
 
+import io.questdb.cairo.sql.PartitionFormat;
 import io.questdb.cairo.sql.PartitionFrame;
 import io.questdb.cairo.sql.RecordCursor;
+import io.questdb.griffin.engine.table.parquet.PartitionDecoder;
 import org.jetbrains.annotations.Nullable;
 
 public class FullFwdPartitionFrameCursor extends AbstractFullPartitionFrameCursor {
+    protected long rowGroupLo; // used for Parquet frames generation
+
+    public FullFwdPartitionFrameCursor(CairoConfiguration configuration) {
+        super(configuration);
+    }
 
     @Override
     public void calculateSize(RecordCursor.Counter counter) {
         while (partitionIndex < partitionHi) {
-            final long hi = getTableReader().openPartition(partitionIndex);
+            final long hi = reader.openPartition(partitionIndex);
             if (hi > 0) {
                 counter.add(hi);
             }
@@ -43,15 +50,48 @@ public class FullFwdPartitionFrameCursor extends AbstractFullPartitionFrameCurso
 
     @Override
     public @Nullable PartitionFrame next() {
+        if (rowGroupIndex < rowGroupCount) {
+            frame.partitionIndex = partitionIndex;
+            frame.partitionFormat = PartitionFormat.PARQUET;
+            frame.rowLo = rowGroupLo;
+            frame.rowHi = rowGroupLo + parquetDecoder.getMetadata().rowGroupSize(rowGroupIndex);
+            rowGroupLo = frame.rowHi;
+            if (++rowGroupIndex == rowGroupCount) {
+                // Proceed to the next partition on the next call.
+                partitionIndex++;
+            }
+            return frame;
+        }
+
         while (partitionIndex < partitionHi) {
-            final long hi = getTableReader().openPartition(partitionIndex);
+            final long hi = reader.openPartition(partitionIndex);
             if (hi < 1) {
                 // this partition is missing, skip
                 partitionIndex++;
             } else {
+                final byte format = reader.getPartitionFormat(partitionIndex);
+
+                if (format == PartitionFormat.PARQUET) {
+                    reader.initParquetDecoder(parquetDecoder, partitionIndex);
+                    final PartitionDecoder.Metadata metadata = parquetDecoder.getMetadata();
+                    rowGroupIndex = 0;
+                    rowGroupCount = metadata.rowGroupCount();
+
+                    frame.partitionIndex = partitionIndex;
+                    frame.partitionFormat = PartitionFormat.PARQUET;
+                    frame.rowLo = 0;
+                    frame.rowHi = metadata.rowGroupSize(rowGroupIndex);
+                    rowGroupLo = frame.rowHi;
+                    rowGroupIndex++;
+                    return frame;
+                }
+
+                assert format == PartitionFormat.NATIVE;
                 frame.partitionIndex = partitionIndex;
+                frame.partitionFormat = PartitionFormat.NATIVE;
                 frame.rowLo = 0;
                 frame.rowHi = hi;
+                frame.rowGroupIndex = -1;
                 partitionIndex++;
                 return frame;
             }
@@ -67,5 +107,8 @@ public class FullFwdPartitionFrameCursor extends AbstractFullPartitionFrameCurso
     @Override
     public void toTop() {
         partitionIndex = 0;
+        rowGroupIndex = 0;
+        rowGroupCount = 0;
+        rowGroupLo = 0;
     }
 }

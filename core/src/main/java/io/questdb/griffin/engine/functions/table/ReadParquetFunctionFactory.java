@@ -68,7 +68,7 @@ public class ReadParquetFunctionFactory implements FunctionFactory {
         } catch (CairoException e) {
             throw SqlException.$(argPos.getQuick(0), "error reading parquet file ").put('[').put(e.getErrno()).put("]: ").put(e.getFlyweightMessage());
         } catch (Throwable e) {
-            throw SqlException.$(argPos.getQuick(0), "filed to read parquet file: ").put(filePath).put(": ").put(e.getMessage());
+            throw SqlException.$(argPos.getQuick(0), "failed to read parquet file: ").put(filePath).put(": ").put(e.getMessage());
         }
     }
 

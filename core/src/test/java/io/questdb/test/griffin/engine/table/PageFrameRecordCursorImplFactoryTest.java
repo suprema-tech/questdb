@@ -104,7 +104,7 @@ public class PageFrameRecordCursorImplFactoryTest extends AbstractCairoTest {
                         BitmapIndexReader.DIR_FORWARD,
                         null
                 );
-                try (FullFwdPartitionFrameCursorFactory frameFactory = new FullFwdPartitionFrameCursorFactory(tableToken, TableUtils.ANY_TABLE_VERSION, metadata)) {
+                try (FullFwdPartitionFrameCursorFactory frameFactory = new FullFwdPartitionFrameCursorFactory(configuration, tableToken, TableUtils.ANY_TABLE_VERSION, metadata)) {
                     // entity index
                     final IntList columnIndexes = new IntList();
                     final IntList columnSizes = new IntList();
@@ -244,7 +244,7 @@ public class PageFrameRecordCursorImplFactoryTest extends AbstractCairoTest {
                 final IntList columnSizes = new IntList();
                 populateColumnTypes(metadata, columnIndexes, columnSizes);
 
-                try (FullFwdPartitionFrameCursorFactory frameFactory = new FullFwdPartitionFrameCursorFactory(tableToken, TableUtils.ANY_TABLE_VERSION, metadata)) {
+                try (FullFwdPartitionFrameCursorFactory frameFactory = new FullFwdPartitionFrameCursorFactory(configuration, tableToken, TableUtils.ANY_TABLE_VERSION, metadata)) {
                     PageFrameFwdRowCursorFactory rowCursorFactory = new PageFrameFwdRowCursorFactory(); // stub RowCursorFactory
                     PageFrameRecordCursorFactory factory = new PageFrameRecordCursorFactory(
                             configuration,
@@ -352,7 +352,7 @@ public class PageFrameRecordCursorImplFactoryTest extends AbstractCairoTest {
                 final IntList columnSizes = new IntList();
                 populateColumnTypes(metadata, columnIndexes, columnSizes);
 
-                try (FullFwdPartitionFrameCursorFactory frameFactory = new FullFwdPartitionFrameCursorFactory(tt, TableUtils.ANY_TABLE_VERSION, metadata)) {
+                try (FullFwdPartitionFrameCursorFactory frameFactory = new FullFwdPartitionFrameCursorFactory(configuration, tt, TableUtils.ANY_TABLE_VERSION, metadata)) {
                     PageFrameFwdRowCursorFactory rowCursorFactory = new PageFrameFwdRowCursorFactory(); // stub RowCursorFactory
                     PageFrameRecordCursorFactory factory = new PageFrameRecordCursorFactory(
                             configuration,

@@ -37,13 +37,14 @@ public class IntervalFwdPartitionFrameCursorFactory extends AbstractPartitionFra
     private IntervalBwdPartitionFrameCursor bwdCursor;
 
     public IntervalFwdPartitionFrameCursorFactory(
+            CairoConfiguration configuration,
             TableToken tableToken,
             long metadataVersion,
             RuntimeIntrinsicIntervalModel intervals,
             int timestampIndex,
             GenericRecordMetadata metadata
     ) {
-        super(tableToken, metadataVersion, metadata);
+        super(configuration, tableToken, metadataVersion, metadata);
         this.cursor = new IntervalFwdPartitionFrameCursor(intervals, timestampIndex);
         this.intervals = intervals;
     }

@@ -370,6 +370,7 @@ public class IntervalBwdPartitionFrameCursorTest extends AbstractCairoTest {
             final TestTableReaderRecord record = new TestTableReaderRecord();
             try (
                     final IntervalBwdPartitionFrameCursorFactory factory = new IntervalBwdPartitionFrameCursorFactory(
+                            configuration,
                             tableToken,
                             0,
                             new RuntimeIntervalModel(intervals),

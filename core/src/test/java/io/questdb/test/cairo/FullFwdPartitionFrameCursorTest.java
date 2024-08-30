@@ -66,7 +66,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
             AbstractCairoTest.create(model);
 
             TableReader reader = newOffPoolReader(configuration, "x");
-            FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+            FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
             cursor.of(reader);
             cursor.close();
             Assert.assertFalse(reader.isOpen());
@@ -97,7 +97,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
 
                 try (
                         TableReader reader = newOffPoolReader(configuration, "x");
-                        FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor()
+                        FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration)
                 ) {
 
                     int frameCount = 0;
@@ -894,7 +894,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
                 try (TableReader reader = createTableReader(configuration, "ABC")) {
                     Assert.assertTrue(reader.getPartitionCount() > 0);
 
-                    FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                    FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                     TestTableReaderRecord record = new TestTableReaderRecord();
 
                     cursor.of(reader);
@@ -1211,7 +1211,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
 
             // lets see what we can read after this catastrophe
             try (TableReader reader = createTableReader(AbstractCairoTest.configuration, "ABC")) {
-                FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                 TestTableReaderRecord record = new TestTableReaderRecord();
 
                 cursor.of(reader);
@@ -1350,7 +1350,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
 
             // let's see what we can read after this catastrophe
             try (TableReader reader = createTableReader(AbstractCairoTest.configuration, "ABC")) {
-                FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                 TestTableReaderRecord record = new TestTableReaderRecord();
 
                 Assert.assertEquals(expectedPartitionCount, reader.getPartitionCount());
@@ -1548,7 +1548,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
 
                         Assert.assertTrue(reader.getPartitionCount() > expectedPartitionMin);
 
-                        FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                        FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                         TestTableReaderRecord record = new TestTableReaderRecord();
 
                         cursor.of(reader);
@@ -1698,7 +1698,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
 
                 // let's see what we can read after this catastrophe
                 try (TableReader reader = createTableReader(AbstractCairoTest.configuration, "ABC")) {
-                    FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                    FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                     TestTableReaderRecord record = new TestTableReaderRecord();
 
                     Assert.assertEquals(expectedPartitionCount, reader.getPartitionCount());
@@ -1781,7 +1781,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
 
                     Assert.assertTrue(reader.getPartitionCount() > expectedPartitionMin);
 
-                    FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                    FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
 
                     // assert baseline
                     cursor.of(reader);
@@ -1851,7 +1851,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
                 writer.commit();
 
                 try (TableReader reader = createTableReader(configuration, "x")) {
-                    FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                    FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                     TestTableReaderRecord record = new TestTableReaderRecord();
 
                     Assert.assertTrue(reader.getPartitionCount() > expectedPartitionMin);
@@ -1920,7 +1920,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
                 writer.commit();
 
                 try (TableReader reader = createTableReader(configuration, "x")) {
-                    FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                    FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                     TestTableReaderRecord record = new TestTableReaderRecord();
 
                     Assert.assertTrue(reader.getPartitionCount() > expectedPartitionMin);
@@ -1996,7 +1996,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
 
                 try (TableReader reader = createTableReader(configuration, "x")) {
 
-                    final FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                    final FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                     final TestTableReaderRecord record = new TestTableReaderRecord();
 
                     Assert.assertTrue(reader.getPartitionCount() > expectedPartitionMin);
@@ -2092,7 +2092,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
 
                     Assert.assertTrue(reader.reload());
 
-                    final FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                    final FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                     final TestTableReaderRecord record = new TestTableReaderRecord();
 
                     Assert.assertTrue(reader.getPartitionCount() > expectedPartitionMin);
@@ -2163,7 +2163,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
 
                 try (TableReader reader = createTableReader(configuration, "x")) {
 
-                    final FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                    final FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                     final TestTableReaderRecord record = new TestTableReaderRecord();
 
                     Assert.assertTrue(reader.getPartitionCount() > expectedPartitionMin);
@@ -2234,7 +2234,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
                 writer.commit();
 
                 try (TableReader reader = createTableReader(configuration, "x")) {
-                    final FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                    final FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                     final TestTableReaderRecord record = new TestTableReaderRecord();
 
                     Assert.assertTrue(reader.getPartitionCount() > expectedPartitionMin);
@@ -2301,7 +2301,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
 
                 // Open partition frame cursor. This one will frame table as collection of
                 // partitions, each partition is a frame.
-                FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                 // TableRecord will help us read the table. We need to position this record using
                 // "recordIndex" and "columnBase".
                 TestTableReaderRecord record = new TestTableReaderRecord();
@@ -2352,7 +2352,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
 
                 // Open partition frame cursor. This one will frame table as collection of
                 // partitions, each partition is a frame.
-                FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                 // TableRecord will help us read the table. We need to position this record using
                 // "recordIndex" and "columnBase".
                 TestTableReaderRecord record = new TestTableReaderRecord();
@@ -2405,7 +2405,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
 
                 // Open partition frame cursor. This one will frame table as collection of
                 // partitions, each partition is a frame.
-                FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                 // TableRecord will help us read the table. We need to position this record using
                 // "recordIndex" and "columnBase".
                 TestTableReaderRecord record = new TestTableReaderRecord();
@@ -2463,7 +2463,7 @@ public class FullFwdPartitionFrameCursorTest extends AbstractCairoTest {
             try (TableReader reader = createTableReader(configuration, "x")) {
                 // Open partition frame cursor. This one will frame table as collection of
                 // partitions, each partition is a frame.
-                FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor();
+                FullFwdPartitionFrameCursor cursor = new FullFwdPartitionFrameCursor(configuration);
                 // TableRecord will help us read the table. We need to position this record using
                 // "recordIndex" and "columnBase".
                 TestTableReaderRecord record = new TestTableReaderRecord();

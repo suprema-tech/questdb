@@ -36,13 +36,14 @@ public class IntervalBwdPartitionFrameCursorFactory extends AbstractPartitionFra
     private final RuntimeIntrinsicIntervalModel intervals;
 
     public IntervalBwdPartitionFrameCursorFactory(
+            CairoConfiguration configuration,
             TableToken tableToken,
             long metadataVersion,
             RuntimeIntrinsicIntervalModel intervals,
             int timestampIndex,
             GenericRecordMetadata metadata
     ) {
-        super(tableToken, metadataVersion, metadata);
+        super(configuration, tableToken, metadataVersion, metadata);
         this.cursor = new IntervalBwdPartitionFrameCursor(intervals, timestampIndex);
         this.intervals = intervals;
     }
